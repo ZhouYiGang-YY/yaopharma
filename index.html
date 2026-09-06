@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>财务条线周会纪要汇总</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a56a8;
+            --primary-light: #2d6cb8;
+            --primary-dark: #144280;
+            --accent: #e8f0fa;
+            --bg: #eef2f7;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #555;
+            --text-light: #888;
+            --border: #d8dfe8;
+            --section-bg: #f5f7fa;
+            --subsection-bg: #eef3f8;
+            --shadow: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.1);
+            --radius: 10px;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+            color: white;
+            padding: 32px 24px 28px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(20,66,128,0.3);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 82px;
+            z-index: 99;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+        }
+
+        .filter-bar-inner {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        /* Dropdown Multi-Select */
+        .dropdown-wrapper {
+            position: relative;
+            min-width: 240px;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text);
+            background: white;
+            transition: all 0.2s;
+            gap: 8px;
+        }
+
+        .dropdown-trigger:hover {
+            border-color: var(--primary-light);
+        }
+
+        .dropdown-trigger.open {
+            border-color: var(--primary);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .dropdown-trigger-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dropdown-arrow {
+            transition: transform 0.2s;
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .dropdown-trigger.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-panel {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1.5px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            z-index: 200;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .dropdown-panel.show {
+            display: block;
+        }
+
+        .dropdown-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+
+        .dropdown-panel-header a {
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .dropdown-panel-header a:hover {
+            text-decoration: underline;
+        }
+
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text);
+            transition: background 0.15s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-option:hover {
+            background: var(--accent);
+        }
+
+        .dropdown-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .dropdown-option-label {
+            flex: 1;
+        }
+
+        .dropdown-option-week {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        /* Overlay to close dropdown */
+        .dropdown-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 150;
+            background: transparent;
+        }
+
+        .dropdown-overlay.show {
+            display: block;
+        }
+
+        /* Container - Multi-column layout */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+
+        .meetings-grid {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        /* Meeting Card */
+        .meeting-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 0;
+        }
+
+        .meeting-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Card Header */
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 16px 20px;
+        }
+
+        .card-header h2 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .card-header .week-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.18);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Meta Grid */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1px;
+            background: var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .meta-item {
+            background: var(--section-bg);
+            padding: 8px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            min-width: 60px;
+        }
+
+        .meta-value {
+            font-size: 12px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Card Body */
+        .card-body {
+            padding: 16px 18px 20px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 16px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            padding: 6px 12px;
+            background: var(--accent);
+            border-left: 4px solid var(--primary);
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 10px;
+        }
+
+        .section-items ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .section-items li {
+            font-size: 12.5px;
+            color: var(--text);
+            line-height: 1.85;
+            padding: 3px 0 3px 16px;
+            position: relative;
+        }
+
+        .section-items li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 2px;
+            top: 3px;
+        }
+
+        /* Subsection */
+        .subsection {
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            background: var(--subsection-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-light);
+        }
+
+        .subsection:last-child {
+            margin-bottom: 0;
+        }
+
+        .subsection-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .subsection-items ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .subsection-items li {
+            font-size: 12px;
+            color: var(--text);
+            line-height: 1.85;
+            padding: 2px 0 2px 14px;
+            position: relative;
+        }
+
+        .subsection-items li::before {
+            content: "○";
+            color: var(--primary-light);
+            font-size: 9px;
+            position: absolute;
+            left: 0;
+            top: 5px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 15px;
+        }
+
+        /* Dropdown backdrop */
+        .backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 90;
+            background: transparent;
+        }
+
+        .backdrop.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .meetings-grid:has(.meeting-card:nth-child(3)) .meeting-card {
+                min-width: 400px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .meetings-grid {
+                flex-direction: column;
+            }
+
+            .meeting-card {
+                min-width: 0 !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 19px;
+            }
+
+            .filter-bar {
+                padding: 12px 16px;
+                top: 72px;
+            }
+
+            .filter-bar-inner {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .dropdown-wrapper {
+                min-width: 0;
+            }
+
+            .container {
+                padding: 16px 12px 40px;
+            }
+
+            .card-header {
+                padding: 14px;
+            }
+
+            .card-body {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>药友制药 · 财务条线周会纪要</h1>
+    <p style="text-align: right">条线领导：汪培隆、代兵、何伟</p>
+</div>
+
+<div class="filter-bar">
+    <div class="filter-bar-inner">
+        <span class="filter-label">会议时间：</span>
+        <div class="dropdown-wrapper" id="dropdownWrapper">
+            <div class="dropdown-trigger open" id="dropdownTrigger" onclick="toggleDropdown()">
+                <span class="dropdown-trigger-text" id="dropdownText">全部会议时间</span>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="dropdown-panel show" id="dropdownPanel"><div class="dropdown-panel-header">
+                    <span id="dropdownCount">已选 2 项</span>
+                    <span>
+                        <a onclick="selectAll()">全选</a>
+                        <span style="color:#ccc;margin:0 4px;">|</span>
+                        <a onclick="clearAll()">清空</a>
+                    </span>
+                </div>
+        <label class="dropdown-option" onclick="event.stopPropagation()">
+            <input type="checkbox" value="20260828" checked="" onchange="toggleOption('20260828')">
+            <span class="dropdown-option-label">2026年8月28日</span>
+            <span class="dropdown-option-week">（2026.8.24-2026.8.28）</span>
+        </label>
+    
+        <label class="dropdown-option" onclick="event.stopPropagation()">
+            <input type="checkbox" value="20260904" checked="" onchange="toggleOption('20260904')">
+            <span class="dropdown-option-label">2026年9月4日</span>
+            <span class="dropdown-option-week">（2026.8.31-2026.9.4）</span>
+        </label>
+    </div>
+        </div>
+    </div>
+</div>
+
+<div class="backdrop show" id="backdrop" onclick="closeDropdown()"></div>
+
+<div class="container" id="meetingContainer"><div class="meetings-grid">
+    <div class="meeting-card">
+        <div class="card-header">
+            <h2>药友制药财务条线周会会议纪要</h2>
+            <span class="week-tag">周报周期：2026.8.24-2026.8.28</span>
+        </div>
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">会议主题</span>
+                <span class="meta-value">财务条线周会</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">会议时间</span>
+                <span class="meta-value">2026年08月28日 13:00-17:00</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">会议地点</span>
+                <span class="meta-value">行政楼1201</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">记录人员</span>
+                <span class="meta-value">秘书处：周奕钢、王山山</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">参会人员</span>
+                <span class="meta-value">汪培隆、代兵、何伟、胡钦、黄婷婷、邱万利、刘羽、张思怡、孙镭、杨端硕、罗清平、冯军、陈渝</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="section">
+            <div class="section-title">一、重要汇报事项</div>
+            <div class="section-items"><ul><li>组织研究公司集团化重组方案的讨论与设计，按刘总指示完成初步方案文件。详见《药友集团控股平台搭建方案》；</li><li>协助事业部完成南药财务负责人及相关岗位调整。</li></ul></div></div><div class="section">
+            <div class="section-title">二、本周工作完成情况</div>
+            <div class="section-items"><div class="subsection">
+                    <div class="subsection-title">（一）建立财务条线会议制度</div>
+                    <div class="subsection-items">
+                        <ul><li>每周一上午各部门及子公司组织部门内部周会，提前通知条线领导（汪、代、何），领导可选择参加，会后提交部门会纪要到秘书组（周奕钢、王山山）。周五下午组织财务条周会，参加人员主要包括条线领导、各部门负责人秘书组成员及相关专题汇报人，秘书组（周奕钢，王山山）负责做好会议纪要，待条线领导确认后提交公司。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（二）26年预算重估及27年预算准备</div>
+                    <div class="subsection-items">
+                        <ul><li>开展新规要求下的全年预算重估工作，重估后预计实现收入 41.5 亿元、利润 8.5 亿元，较上一版测算收入增加约 1 亿元；上报集团的全年经营目标为：收入 40 亿元、净利润 8 亿元、现金流 9 亿元；考核目标：收入 44.5 亿元、净利润 12.5 亿元，有差距</li><li>成本部、研发财务、吉洛华等各部门/子公司已同步启动2027年预算编制准备工作。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（三）资金与税务管理</div>
+                    <div class="subsection-items">
+                        <ul><li>推进建设银行两江支行授信业务办理，拟申请授信额度 2 亿元；</li><li>跟进进出口银行科技创新再贷款贴息相关工作。该业务执行先付息后补贴模式，贴息资金回款存在不确定性。经与进出口银行沟通，建议以凯林公司作为贷款主体：一是药友制药账面货币资金较为充裕，暂无法获批对应授信；二是凯林更符合中小企业贴息政策适用条件，贴息资金落地保障性更高；</li><li>合信西开税务风险：该优惠批复形成于 2015 年，批复范围内仅包含美唑单一品种。因批复时间久远、覆盖品种有限，存在被税务机关提出质疑的风险；若税务机关不予认可，需重新开展资质认证，现有品种较难匹配西部大开发医药类相关条款，将产生较大税务风险，后续需持续跟踪事项进展；</li><li>就 GR1803 项目研发费用加计扣除及相关税务处理，联合安永开展专题研讨；</li><li>集团内资金占用税务风险：母公司对吉斯凯应收款项 2.85 亿元、对吉洛华应收款项 6.11 亿元，凯林对母公司应付款项 1.26 亿元。拟定处置方案：推动吉斯凯尽快实施分红；吉洛华在满足高新技术企业净资产增长率考核要求的前提下开展分红；落实凯林独立授信工作。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（四）供应链与采购管理</div>
+                    <div class="subsection-items">
+                        <ul><li>物料保供跟进：已完成大连业建辅料断供风险上报、备选厂家初步梳理、甘氨胆酸退换货对接、常州瑞明及Unichem原料药供货情况摸排。Unichem验证批存在QC检验异常，暂未确定后续采购安排；大连业建仅少量发货，供应存在阶段性紧张风险；</li><li>供应链制度修订：《物料供应商评估筛选管理标准》修订已完成，待报审；研发类物料供应商准入制度已启动拟定；</li><li>液氮询比价筹备：已完成液氮用量统计、市场供应现状摸排，确定周边备选调研供应商名单，待开展实地考察与询比价；</li><li>二甲双胍价格调研：已完成二甲双胍原料市场价格专项调研，摸清主流供应商报价，梳理原有协议存量余量及价格偏差，完成价格对比分析，为后续降价谈判提供依据。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（五）结算管理</div>
+                    <div class="subsection-items">
+                        <ul><li>结算政策落地：公司结算政策已基本确定，各产品结算规则正陆续落地执行；</li><li>流向收集：受大批接续产品影响，流向收取范围大幅扩大；部分商业未开通DDI直连或无账号密码，收集难度加大。需总体规划收取范围，与结算相关的按流向结算优先处理，按发货结算的暂缓；</li><li>产品底价分析模型：精细化《产品底价分析报表》测算模型，在医院市场、零售市场基础上，将医院市场进一步拆分为省代、自然人、自然流三个维度，分别测算重点产品在各维度的销售费用率与销售完成情况。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（六）审计与合规</div>
+                    <div class="subsection-items">
+                        <ul><li>新兴药业采购审计：完成新兴药业采购业务现场审计，已与新兴领导及采购部负责人交流审计发现问题；</li><li>新兴高企资质风险：新兴药业高新技术企业申报资料存在重大缺陷，计划聘请中介机构协助完成资料整理工作。服务商沈阳鑫鼎恒科技有限公司提供两套服务报价：全包服务 3 万元 / 年；仅提供申报指导服务至完成申报 1.2 万元 / 年。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（七）成本管理</div>
+                    <div class="subsection-items">
+                        <ul><li>AI 工具建设相关工作已基本落地，现阶段推进存货分析看板开发制作；</li><li>真实损失统计：根据领导工作部署，组织统计各子公司 2026 年度账面报废以外的真实损失，包含未履行报废审批流程物料、异常在产物料等。由张思怡统筹通知各子公司开展统计</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（八）工程管理</div>
+                    <div class="subsection-items">
+                        <ul><li>年度采招：药友集团2027-2028年度土建零星维修及项目招标清标，共3个标段（药友/吉斯瑞、凯林、洞庭），8家单位投标，初步完成数据汇总；</li><li>药友集团2027-2028年度暖通及彩钢零星维修及项目招标，共3个标段，已安排第三方造价作为定标参考价，待回标及造价完成后清标。</li></ul>
+                    </div>
+                </div></div></div><div class="section">
+            <div class="section-title">三、下周工作安排</div>
+            <div class="section-items"><ul><li>落实集团重组有关工商、税务沟通，确定重组方案。同时启动股东沟通工作；</li><li>各部门、各子公司有序开展2027年度预算编制相关工作；</li><li>推进年度土建零星维修及项目招标清标，同步跟进暖通及彩钢零星维修项目造价相关工作；</li><li>对接第三方机构开展商务谈判，推进 YP05002 项目澳洲临床退税相关工作；</li><li>持续跟进全品类生产物料保供专项；完成二甲双胍供应商价格谈判；完成液氮供应商实地考察与询比价；推进供应链制度报审，同步开展相关制度初稿筹备工作；</li><li>持续推进存货分析看板开发制作工作；</li><li>对接主管税务机关，推进 GR1803 项目 3000 万元待抵扣税金相关事项的沟通落实。</li></ul></div></div>
+        </div>
+    </div>
+    
+    <div class="meeting-card">
+        <div class="card-header">
+            <h2>药友制药财务管理中心周会制度工作部署会议纪要</h2>
+            <span class="week-tag">周报周期：2026.8.31-2026.9.4</span>
+        </div>
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">会议主题</span>
+                <span class="meta-value">财务条线周会</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">会议时间</span>
+                <span class="meta-value">2026年9月4日 13:00-14:00</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">会议地点</span>
+                <span class="meta-value">行政楼1201会议室</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">记录人员</span>
+                <span class="meta-value">秘书处：周奕钢、王山山</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">参会人员</span>
+                <span class="meta-value">汪培隆、代兵、何伟、谭卿、宋花普、黄婷婷、胡钦、刘羽、邱万利、杨端硕、张思怡、周晖、周奕钢、孙镭、罗清平、陈皎、杨浩、尹玲</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="section">
+            <div class="section-title">一、本周工作完成情况</div>
+            <div class="section-items"><div class="subsection">
+                    <div class="subsection-title">（一）预算启动</div>
+                    <div class="subsection-items">
+                        <ul><li>跟进复星集团预算安排，落地药友及子公司预算（销售预算底表编制、研发费用预算等先行）；</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（二）资金与税务管理</div>
+                    <div class="subsection-items">
+                        <ul><li>口行 1 亿元贷款本月 18 日到期，续贷以凯林为主体办理授信中（约 1 个月）；从大额存单抽 1 亿元转成都银行通知存款（利率约 0.9%），为金泰 2.5 亿支付留出资金；万邦代持 3000 万 本月26 日到期，展期待领导层商议；</li><li>与两江新区税务沟通辉瑞境外收入（区局升级市局，已提交说明待回复，预计调整 1/2 季度申报或 3 季度冲回）；与集团税务条线过会，GR1803 首付款及里程碑费共 5.5 亿不能加计扣除；</li><li>就 GR1803 项目研发费用加计扣除及相关税务处理，联合安永开展专题研讨；</li><li>澳洲退税服务费由 40% 谈至 35%，合同已审，对方盖章后走流程（启动办理暂不用付款）；</li><li>西药起草在藏公司企业实质性运营自评报告。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（三）项目管理</div>
+                    <div class="subsection-items">
+                        <ul><li>巴西项目对方价格不满足，已通知取消；</li><li>AR1001 项目须 12/15 前开票 2300 万元（款项年底收回）；</li><li>注射用美罗培南签订委外协议（2027 年委托庆余堂生产）；</li><li>汉霖双子星项目合作方式拟变更为成立子公司，需与领导讨论财务处理。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（四）结算管理</div>
+                    <div class="subsection-items">
+                        <ul><li>西药对吉斯美、吉洛华开票结算费用仅有合同、无材料支撑，后续需两家单位补齐全套结算材料；</li><li>推进业务部门尽快签订新调整协议（预提及实际代支付差距大）；服务成果合规事项推向业务部门，明确市场经理真实性职责；</li><li>全流向管理启动，重庆本周完成拉通；产品维度数据呈现（发货流向、商业库存背离度分析，强调统计学意义即可）。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（五）审计与合规</div>
+                    <div class="subsection-items">
+                        <ul><li>新兴药业采购审计：完成新兴审计底稿整理；</li><li>新兴高企资质风险：咨询费稽查（省局证据不足暂停，待重庆案件结论）；高企多年未检、研发资料空白，已协调外部机构（全包 21—26 年 / 部分协助两套方案）；已梳理剔除研发中生产、领导等不相关人员；</li><li>进口左氧原料单价升至 20 万日元/kg，或引发海关/统计局询问。</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（六）成本存货管理</div>
+                    <div class="subsection-items">
+                        <ul><li>奥沙利铂扩批报废 10 万支（成本约 346 万，26 年 6 月到期），拟研究铂分解回收减损；硼替、伊立替康可能报废（成本 140 万）；</li><li>拉氧 0.5g 库存 105 万瓶（655 万，27 年 3 月到期，月均销 6 万瓶，存报废风险）；头孢唑啉钠原料 300kg 过效期（28 万）进存货报废损失；</li></ul>
+                    </div>
+                </div><div class="subsection">
+                    <div class="subsection-title">（七）工程管理</div>
+                    <div class="subsection-items">
+                        <ul><li>长寿基地项目采招——二期四阶段外墙招投标涉嫌违规，集团廉政督察部现场核查后建议对供应商拉黑并索赔（对方已进场，待领导决策）；科创中心钢结构加层结算——复审单位完成现场踏勘及对量，190 万大型机械进出场及安拆费争议（合同与事实不符）待向领导汇报后定方案。</li></ul>
+                    </div>
+                </div></div></div><div class="section">
+            <div class="section-title">二、下周工作安排</div>
+            <div class="section-items"><ul><li>子公司高企研发人员归集合规性问题，需要将集团研发资源下沉，明确各子公司人员的真实岗位与归属；</li><li>稳步推进2027年度预算工作，各部门、各子公司有序开展编制相关工作（注意与业务相关联，并且基于事件和时间节点做好预算假设，需与采购计划、生产计划联动，以确保预算的准确性，同时注意采购预算编制要落实到供应商层面）；</li><li>梳理AI在财务条线的应用场景，组织一次交流分享会；</li><li>继续推进公司注销工作、澳洲退税合同签订；</li><li>由张思怡牵头开展集团存货管理，全面盘点存货损失并完善呆滞物料处理。下周起对报废情况梳理，下发 2026 年 1—8 月各子公司真实损失统计表；</li><li>清理研发项目库存物料工作需扩展到凯林等子公司，有计划开展，建立研发物料管理联动机制，形成项目启动至结项全周期跟踪；</li><li>落实审计整改：出具新兴采购审计报告，根据审计报告结果，针对存在的问题进行专项整改。</li></ul></div></div>
+        </div>
+    </div>
+    </div></div>
+
+<script>
+const meetings = [
+  {
+    "id": "20260828",
+    "date": "2026-08-28",
+    "dateLabel": "2026年8月28日",
+    "weekRange": "2026.8.24-2026.8.28",
+    "title": "药友制药财务条线周会会议纪要",
+    "topic": "财务条线周会",
+    "time": "2026年08月28日 13:00-17:00",
+    "location": "行政楼1201",
+    "attendees": "汪培隆、代兵、何伟、胡钦、黄婷婷、邱万利、刘羽、张思怡、孙镭、杨端硕、罗清平、冯军、陈渝",
+    "recorders": "秘书处：周奕钢、王山山",
+    "sections": [
+      {
+        "title": "一、重要汇报事项",
+        "items": [
+          "组织研究公司集团化重组方案的讨论与设计，按刘总指示完成初步方案文件。详见《药友集团控股平台搭建方案》；",
+          "协助事业部完成南药财务负责人及相关岗位调整。"
+        ],
+        "subsections": []
+      },
+      {
+        "title": "二、本周工作完成情况",
+        "items": [],
+        "subsections": [
+          {
+            "title": "（一）建立财务条线会议制度",
+            "items": [
+              "每周一上午各部门及子公司组织部门内部周会，提前通知条线领导（汪、代、何），领导可选择参加，会后提交部门会纪要到秘书组（周奕钢、王山山）。周五下午组织财务条周会，参加人员主要包括条线领导、各部门负责人秘书组成员及相关专题汇报人，秘书组（周奕钢，王山山）负责做好会议纪要，待条线领导确认后提交公司。"
+            ]
+          },
+          {
+            "title": "（二）26年预算重估及27年预算准备",
+            "items": [
+              "开展新规要求下的全年预算重估工作，重估后预计实现收入 41.5 亿元、利润 8.5 亿元，较上一版测算收入增加约 1 亿元；上报集团的全年经营目标为：收入 40 亿元、净利润 8 亿元、现金流 9 亿元；考核目标：收入 44.5 亿元、净利润 12.5 亿元，有差距",
+              "成本部、研发财务、吉洛华等各部门/子公司已同步启动2027年预算编制准备工作。"
+            ]
+          },
+          {
+            "title": "（三）资金与税务管理",
+            "items": [
+              "推进建设银行两江支行授信业务办理，拟申请授信额度 2 亿元；",
+              "跟进进出口银行科技创新再贷款贴息相关工作。该业务执行先付息后补贴模式，贴息资金回款存在不确定性。经与进出口银行沟通，建议以凯林公司作为贷款主体：一是药友制药账面货币资金较为充裕，暂无法获批对应授信；二是凯林更符合中小企业贴息政策适用条件，贴息资金落地保障性更高；",
+              "合信西开税务风险：该优惠批复形成于 2015 年，批复范围内仅包含美唑单一品种。因批复时间久远、覆盖品种有限，存在被税务机关提出质疑的风险；若税务机关不予认可，需重新开展资质认证，现有品种较难匹配西部大开发医药类相关条款，将产生较大税务风险，后续需持续跟踪事项进展；",
+              "就 GR1803 项目研发费用加计扣除及相关税务处理，联合安永开展专题研讨；",
+              "集团内资金占用税务风险：母公司对吉斯凯应收款项 2.85 亿元、对吉洛华应收款项 6.11 亿元，凯林对母公司应付款项 1.26 亿元。拟定处置方案：推动吉斯凯尽快实施分红；吉洛华在满足高新技术企业净资产增长率考核要求的前提下开展分红；落实凯林独立授信工作。"
+            ]
+          },
+          {
+            "title": "（四）供应链与采购管理",
+            "items": [
+              "物料保供跟进：已完成大连业建辅料断供风险上报、备选厂家初步梳理、甘氨胆酸退换货对接、常州瑞明及Unichem原料药供货情况摸排。Unichem验证批存在QC检验异常，暂未确定后续采购安排；大连业建仅少量发货，供应存在阶段性紧张风险；",
+              "供应链制度修订：《物料供应商评估筛选管理标准》修订已完成，待报审；研发类物料供应商准入制度已启动拟定；",
+              "液氮询比价筹备：已完成液氮用量统计、市场供应现状摸排，确定周边备选调研供应商名单，待开展实地考察与询比价；",
+              "二甲双胍价格调研：已完成二甲双胍原料市场价格专项调研，摸清主流供应商报价，梳理原有协议存量余量及价格偏差，完成价格对比分析，为后续降价谈判提供依据。"
+            ]
+          },
+          {
+            "title": "（五）结算管理",
+            "items": [
+              "结算政策落地：公司结算政策已基本确定，各产品结算规则正陆续落地执行；",
+              "流向收集：受大批接续产品影响，流向收取范围大幅扩大；部分商业未开通DDI直连或无账号密码，收集难度加大。需总体规划收取范围，与结算相关的按流向结算优先处理，按发货结算的暂缓；",
+              "产品底价分析模型：精细化《产品底价分析报表》测算模型，在医院市场、零售市场基础上，将医院市场进一步拆分为省代、自然人、自然流三个维度，分别测算重点产品在各维度的销售费用率与销售完成情况。"
+            ]
+          },
+          {
+            "title": "（六）审计与合规",
+            "items": [
+              "新兴药业采购审计：完成新兴药业采购业务现场审计，已与新兴领导及采购部负责人交流审计发现问题；",
+              "新兴高企资质风险：新兴药业高新技术企业申报资料存在重大缺陷，计划聘请中介机构协助完成资料整理工作。服务商沈阳鑫鼎恒科技有限公司提供两套服务报价：全包服务 3 万元 / 年；仅提供申报指导服务至完成申报 1.2 万元 / 年。"
+            ]
+          },
+          {
+            "title": "（七）成本管理",
+            "items": [
+              "AI 工具建设相关工作已基本落地，现阶段推进存货分析看板开发制作；",
+              "真实损失统计：根据领导工作部署，组织统计各子公司 2026 年度账面报废以外的真实损失，包含未履行报废审批流程物料、异常在产物料等。由张思怡统筹通知各子公司开展统计"
+            ]
+          },
+          {
+            "title": "（八）工程管理",
+            "items": [
+              "年度采招：药友集团2027-2028年度土建零星维修及项目招标清标，共3个标段（药友/吉斯瑞、凯林、洞庭），8家单位投标，初步完成数据汇总；",
+              "药友集团2027-2028年度暖通及彩钢零星维修及项目招标，共3个标段，已安排第三方造价作为定标参考价，待回标及造价完成后清标。"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "三、下周工作安排",
+        "items": [
+          "落实集团重组有关工商、税务沟通，确定重组方案。同时启动股东沟通工作；",
+          "各部门、各子公司有序开展2027年度预算编制相关工作；",
+          "推进年度土建零星维修及项目招标清标，同步跟进暖通及彩钢零星维修项目造价相关工作；",
+          "对接第三方机构开展商务谈判，推进 YP05002 项目澳洲临床退税相关工作；",
+          "持续跟进全品类生产物料保供专项；完成二甲双胍供应商价格谈判；完成液氮供应商实地考察与询比价；推进供应链制度报审，同步开展相关制度初稿筹备工作；",
+          "持续推进存货分析看板开发制作工作；",
+          "对接主管税务机关，推进 GR1803 项目 3000 万元待抵扣税金相关事项的沟通落实。"
+        ],
+        "subsections": []
+      }
+    ]
+  },
+  {
+    "id": "20260904",
+    "date": "2026-09-04",
+    "dateLabel": "2026年9月4日",
+    "weekRange": "2026.8.31-2026.9.4",
+    "title": "药友制药财务管理中心周会制度工作部署会议纪要",
+    "topic": "财务条线周会",
+    "time": "2026年9月4日 13:00-14:00",
+    "location": "行政楼1201会议室",
+    "attendees": "汪培隆、代兵、何伟、谭卿、宋花普、黄婷婷、胡钦、刘羽、邱万利、杨端硕、张思怡、周晖、周奕钢、孙镭、罗清平、陈皎、杨浩、尹玲",
+    "recorders": "秘书处：周奕钢、王山山",
+    "sections": [
+      {
+        "title": "一、本周工作完成情况",
+        "items": [],
+        "subsections": [
+          {
+            "title": "（一）预算启动",
+            "items": [
+              "跟进复星集团预算安排，落地药友及子公司预算（销售预算底表编制、研发费用预算等先行）；"
+            ]
+          },
+          {
+            "title": "（二）资金与税务管理",
+            "items": [
+              "口行 1 亿元贷款本月 18 日到期，续贷以凯林为主体办理授信中（约 1 个月）；从大额存单抽 1 亿元转成都银行通知存款（利率约 0.9%），为金泰 2.5 亿支付留出资金；万邦代持 3000 万 本月26 日到期，展期待领导层商议；",
+              "与两江新区税务沟通辉瑞境外收入（区局升级市局，已提交说明待回复，预计调整 1/2 季度申报或 3 季度冲回）；与集团税务条线过会，GR1803 首付款及里程碑费共 5.5 亿不能加计扣除；",
+              "就 GR1803 项目研发费用加计扣除及相关税务处理，联合安永开展专题研讨；",
+              "澳洲退税服务费由 40% 谈至 35%，合同已审，对方盖章后走流程（启动办理暂不用付款）；",
+              "西药起草在藏公司企业实质性运营自评报告。"
+            ]
+          },
+          {
+            "title": "（三）项目管理",
+            "items": [
+              "巴西项目对方价格不满足，已通知取消；",
+              "AR1001 项目须 12/15 前开票 2300 万元（款项年底收回）；",
+              "注射用美罗培南签订委外协议（2027 年委托庆余堂生产）；",
+              "汉霖双子星项目合作方式拟变更为成立子公司，需与领导讨论财务处理。"
+            ]
+          },
+          {
+            "title": "（四）结算管理",
+            "items": [
+              "西药对吉斯美、吉洛华开票结算费用仅有合同、无材料支撑，后续需两家单位补齐全套结算材料；",
+              "推进业务部门尽快签订新调整协议（预提及实际代支付差距大）；服务成果合规事项推向业务部门，明确市场经理真实性职责；",
+              "全流向管理启动，重庆本周完成拉通；产品维度数据呈现（发货流向、商业库存背离度分析，强调统计学意义即可）。"
+            ]
+          },
+          {
+            "title": "（五）审计与合规",
+            "items": [
+              "新兴药业采购审计：完成新兴审计底稿整理；",
+              "新兴高企资质风险：咨询费稽查（省局证据不足暂停，待重庆案件结论）；高企多年未检、研发资料空白，已协调外部机构（全包 21—26 年 / 部分协助两套方案）；已梳理剔除研发中生产、领导等不相关人员；",
+              "进口左氧原料单价升至 20 万日元/kg，或引发海关/统计局询问。"
+            ]
+          },
+          {
+            "title": "（六）成本存货管理",
+            "items": [
+              "奥沙利铂扩批报废 10 万支（成本约 346 万，26 年 6 月到期），拟研究铂分解回收减损；硼替、伊立替康可能报废（成本 140 万）；",
+              "拉氧 0.5g 库存 105 万瓶（655 万，27 年 3 月到期，月均销 6 万瓶，存报废风险）；头孢唑啉钠原料 300kg 过效期（28 万）进存货报废损失；"
+            ]
+          },
+          {
+            "title": "（七）工程管理",
+            "items": [
+              "长寿基地项目采招——二期四阶段外墙招投标涉嫌违规，集团廉政督察部现场核查后建议对供应商拉黑并索赔（对方已进场，待领导决策）；科创中心钢结构加层结算——复审单位完成现场踏勘及对量，190 万大型机械进出场及安拆费争议（合同与事实不符）待向领导汇报后定方案。"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "二、下周工作安排",
+        "items": [
+          "子公司高企研发人员归集合规性问题，需要将集团研发资源下沉，明确各子公司人员的真实岗位与归属；",
+          "稳步推进2027年度预算工作，各部门、各子公司有序开展编制相关工作（注意与业务相关联，并且基于事件和时间节点做好预算假设，需与采购计划、生产计划联动，以确保预算的准确性，同时注意采购预算编制要落实到供应商层面）；",
+          "梳理AI在财务条线的应用场景，组织一次交流分享会；",
+          "继续推进公司注销工作、澳洲退税合同签订；",
+          "由张思怡牵头开展集团存货管理，全面盘点存货损失并完善呆滞物料处理。下周起对报废情况梳理，下发 2026 年 1—8 月各子公司真实损失统计表；",
+          "清理研发项目库存物料工作需扩展到凯林等子公司，有计划开展，建立研发物料管理联动机制，形成项目启动至结项全周期跟踪；",
+          "落实审计整改：出具新兴采购审计报告，根据审计报告结果，针对存在的问题进行专项整改。"
+        ],
+        "subsections": []
+      }
+    ]
+  }
+];
+
+let selectedIds = new Set(meetings.map(m => m.id));
+
+// Dropdown functions
+function toggleDropdown() {
+    const trigger = document.getElementById('dropdownTrigger');
+    const panel = document.getElementById('dropdownPanel');
+    const backdrop = document.getElementById('backdrop');
+    const isOpen = panel.classList.contains('show');
+
+    if (isOpen) {
+        closeDropdown();
+    } else {
+        trigger.classList.add('open');
+        panel.classList.add('show');
+        backdrop.classList.add('show');
+    }
+}
+
+function closeDropdown() {
+    document.getElementById('dropdownTrigger').classList.remove('open');
+    document.getElementById('dropdownPanel').classList.remove('show');
+    document.getElementById('backdrop').classList.remove('show');
+}
+
+function renderDropdown() {
+    const panel = document.getElementById('dropdownPanel');
+    // Keep header, rebuild options
+    const header = panel.querySelector('.dropdown-panel-header');
+    panel.innerHTML = '';
+    panel.appendChild(header);
+
+    const optionsHtml = meetings.map(m => `
+        <label class="dropdown-option" onclick="event.stopPropagation()">
+            <input type="checkbox" value="${m.id}" ${selectedIds.has(m.id) ? 'checked' : ''} onchange="toggleOption('${m.id}')">
+            <span class="dropdown-option-label">${m.dateLabel}</span>
+            <span class="dropdown-option-week">（${m.weekRange}）</span>
+        </label>
+    `).join('');
+
+    panel.insertAdjacentHTML('beforeend', optionsHtml);
+    updateDropdownText();
+}
+
+function updateDropdownText() {
+    const textEl = document.getElementById('dropdownText');
+    const countEl = document.getElementById('dropdownCount');
+    const count = selectedIds.size;
+
+    if (count === 0) {
+        textEl.textContent = '请选择';
+    } else if (count === meetings.length) {
+        textEl.textContent = '全部会议时间';
+    } else {
+        const labels = meetings.filter(m => selectedIds.has(m.id)).map(m => m.dateLabel);
+        textEl.textContent = labels.join('、');
+    }
+    countEl.textContent = `已选 ${count} 项`;
+}
+
+function toggleOption(id) {
+    if (selectedIds.has(id)) {
+        selectedIds.delete(id);
+    } else {
+        selectedIds.add(id);
+    }
+    updateDropdownText();
+    renderMeetings();
+}
+
+function selectAll() {
+    selectedIds = new Set(meetings.map(m => m.id));
+    renderDropdown();
+    renderMeetings();
+}
+
+function clearAll() {
+    selectedIds.clear();
+    renderDropdown();
+    renderMeetings();
+}
+
+function renderMeetings() {
+    const container = document.getElementById('meetingContainer');
+    const filtered = meetings.filter(m => selectedIds.has(m.id));
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <path d="M16 2v4M8 2v4M3 10h18"/>
+                </svg>
+                <p>请选择至少一个会议时间进行查看</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '<div class="meetings-grid">';
+    filtered.forEach((meeting) => {
+        html += renderMeetingCard(meeting);
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function renderMeetingCard(meeting) {
+    let sectionsHtml = '';
+    for (const section of meeting.sections) {
+        let sectionHtml = `<div class="section">
+            <div class="section-title">${section.title}</div>
+            <div class="section-items">`;
+
+        if (section.items.length > 0) {
+            sectionHtml += `<ul>${section.items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+        }
+
+        if (section.subsections.length > 0) {
+            for (const sub of section.subsections) {
+                sectionHtml += `<div class="subsection">
+                    <div class="subsection-title">${sub.title}</div>
+                    <div class="subsection-items">
+                        <ul>${sub.items.map(item => `<li>${item}</li>`).join('')}</ul>
+                    </div>
+                </div>`;
+            }
+        }
+
+        sectionHtml += `</div></div>`;
+        sectionsHtml += sectionHtml;
+    }
+
+    return `
+    <div class="meeting-card">
+        <div class="card-header">
+            <h2>${meeting.title}</h2>
+            <span class="week-tag">周报周期：${meeting.weekRange}</span>
+        </div>
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">会议主题</span>
+                <span class="meta-value">${meeting.topic}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">会议时间</span>
+                <span class="meta-value">${meeting.time}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">会议地点</span>
+                <span class="meta-value">${meeting.location}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">记录人员</span>
+                <span class="meta-value">${meeting.recorders}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">参会人员</span>
+                <span class="meta-value">${meeting.attendees}</span>
+            </div>
+        </div>
+        <div class="card-body">
+            ${sectionsHtml}
+        </div>
+    </div>
+    `;
+}
+
+// Init
+renderDropdown();
+renderMeetings();
+</script>
+
+
+</body></html>
